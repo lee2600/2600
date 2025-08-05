@@ -335,6 +335,14 @@ const CheckoutDetails = ({
     const currency = getCurrentCurrency();
     const device = detectDevice();
     
+    // Coordenadas de la tienda para mensajes de recogida
+    const storeLocation = {
+      lat: 20.0247,
+      lng: -75.8219,
+      address: "Santiago de Cuba, Cuba",
+      name: "Yero Shop!"
+    };
+    
     console.log('🚀 Iniciando envío a WhatsApp...');
     console.log('📱 Dispositivo:', device);
     console.log('📞 Número de WhatsApp:', storeConfig.storeInfo?.whatsappNumber || '+53 54690878');
@@ -401,27 +409,27 @@ const CheckoutDetails = ({
     let message = `🏪 *YERO SHOP!* - Tu tienda online de confianza\n\n`;
     
     // Separadores visuales cortos y elegantes
-    message += `▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬\n`;
+    message += `-----------------------\n`;
     message += `🛍️ *CATÁLOGO DIGITAL PROFESIONAL* 🛍️\n`;
-    message += `▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬\n\n`;
+    message += `-----------------------\n\n`;
     
     // Número de orden con diseño moderno
-    message += `✨ ▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬ ✨\n`;
+    message += `✨ ----------------------- ✨\n`;
     message += `🎯 *NUEVO PEDIDO*\n`;
     message += `🔥 *#${orderNumber}* 🔥\n`;
-    message += `✨ ▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬ ✨\n\n`;
+    message += `✨ ----------------------- ✨\n\n`;
     
-    message += `▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬\n`;
+    message += `-----------------------\n`;
     message += `👤 *INFORMACIÓN DEL CLIENTE*\n`;
-    message += `▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬\n`;
+    message += `-----------------------\n`;
     message += `📝 *Nombre Completo:* ${firstName} ${lastName}\n`;
     message += `📧 *Correo Electrónico:* ${email}\n`;
     message += `💱 *Moneda seleccionada:* ${currency.flag} ${currency.name} (${currency.code})\n\n`;
     
     // Información del servicio con mejor formato
-    message += `▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬\n`;
+    message += `-----------------------\n`;
     message += `🚚 *DETALLES DE ENTREGA*\n`;
-    message += `▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬\n`;
+    message += `-----------------------\n`;
     message += `👤 *Nombre Completo del Cliente:* ${selectedAddress.username}\n`;
     message += `📱 *Número de Móvil del Cliente:* ${selectedAddress.mobile}\n`;
     
@@ -436,6 +444,8 @@ const CheckoutDetails = ({
     } else {
       message += `📦 *Modalidad:* Recoger en tienda\n`;
       message += `🏪 *Ubicación:* Yero Shop! - Santiago de Cuba\n`;
+      message += `📍 *Dirección exacta:* ${storeLocation.address}\n`;
+      message += `🗺️ *Ver ubicación:* https://maps.app.goo.gl/UjYnYjt2LQa2YGdx8\n`;
       if (selectedAddress.additionalInfo) {
         message += `📝 *Información adicional:* ${selectedAddress.additionalInfo}\n`;
       }
@@ -444,9 +454,9 @@ const CheckoutDetails = ({
     message += `\n`;
     
     // Productos con iconos y mejor formato MEJORADO
-    message += `▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬\n`;
+    message += `-----------------------\n`;
     message += `🛍️ *PRODUCTOS SOLICITADOS*\n`;
-    message += `▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬\n`;
+    message += `-----------------------\n`;
     cartFromContext.forEach((item, index) => {
       const productIcon = getProductIcon(item.category);
       const colorCode = item.colors[0]?.color || '#000000';
@@ -458,13 +468,13 @@ const CheckoutDetails = ({
       message += `   📊 *Cantidad:* ${item.qty} unidad${item.qty > 1 ? 'es' : ''}\n`;
       message += `   💵 *Precio unitario:* ${formatPriceWithCode(item.price)}\n`;
       message += `   💰 *Subtotal:* ${formatPriceWithCode(subtotal)}\n`;
-      message += `   ▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬\n`;
+      message += `   -----------------------\n`;
     });
     
     // Resumen financiero profesional MEJORADO Y ORGANIZADO
-    message += `\n▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬\n`;
+    message += `\n-----------------------\n`;
     message += `💳 *RESUMEN FINANCIERO DETALLADO*\n`;
-    message += `▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬\n`;
+    message += `-----------------------\n`;
     message += `🛍️ *Subtotal productos:* ${formatPriceWithCode(totalAmountFromContext)}\n`;
     
     if (activeCoupon) {
@@ -480,58 +490,44 @@ const CheckoutDetails = ({
       message += `🚚 *Costo de entrega:* GRATIS (Recogida en tienda)\n`;
     }
     
-    message += `▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬\n`;
+    message += `-----------------------\n`;
     message += `💰 *TOTAL A PAGAR:* ${formatPriceWithCode(finalPriceToPay)}\n`;
     message += `💱 *Moneda:* ${currency.flag} ${currency.name} (${currency.code})\n`;
-    message += `▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬\n\n`;
+    message += `-----------------------\n\n`;
     
-    // Información adicional profesional
-    message += `▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬\n`;
+    // Información adicional profesional - RESUMIDA
+    message += `-----------------------\n`;
     message += `📅 *Fecha y hora del pedido:*\n`;
-    message += `▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬\n`;
+    message += `-----------------------\n`;
     message += `${new Date().toLocaleString('es-CU', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
+      weekday: 'short',
+      year: '2-digit',
+      month: 'short',
       day: 'numeric',
       hour: '2-digit',
       minute: '2-digit',
       timeZone: 'America/Havana'
     })}\n\n`;
     
-    // Instrucciones importantes MEJORADAS
-    message += `▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬\n`;
-    message += `📋 *INSTRUCCIONES IMPORTANTES:*\n`;
-    message += `▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬\n`;
-    message += `✅ *Confirmar disponibilidad* de todos los productos\n`;
-    message += `📍 *Verificar dirección* de entrega o datos de recogida\n`;
-    message += `⏰ *Coordinar horario* de entrega/recogida conveniente\n`;
+    // Instrucciones importantes RESUMIDAS
+    message += `-----------------------\n`;
+    message += `📋 *INSTRUCCIONES:*\n`;
+    message += `-----------------------\n`;
+    message += `✅ Confirmar disponibilidad\n`;
+    message += `📍 Verificar dirección/recogida\n`;
+    message += `⏰ Coordinar horario\n`;
     message += `🔢 *Número de referencia:* #${orderNumber}\n`;
-    message += `💱 *Precios mostrados en:* ${currency.flag} ${currency.name} (${currency.code})\n`;
-    message += `📞 *Contacto directo:* ${storeConfig.storeInfo?.whatsappNumber || '+53 54690878'}\n\n`;
+    message += `📞 *Contacto:* ${storeConfig.storeInfo?.whatsappNumber || '+53 54690878'}\n\n`;
     
-    message += `▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬\n`;
-    message += `🏪 *INFORMACIÓN DE LA TIENDA*\n`;
-    message += `▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬\n`;
+    message += `-----------------------\n`;
+    message += `🏪 *YERO SHOP!*\n`;
+    message += `-----------------------\n`;
     message += `🏪 *Yero Shop!*\n`;
-    message += `"La tienda online de compras hecha a tu medida" ✨\n`;
+    message += `"Tu tienda online de confianza" ✨\n`;
     message += `📍 Santiago de Cuba, Cuba\n`;
     message += `📱 WhatsApp: ${storeConfig.storeInfo?.whatsappNumber || '+53 54690878'}\n`;
-    message += `🌐 Tienda online: https://yeroshop.vercel.app\n\n`;
-    message += `▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬\n`;
-    message += `🙏 *MENSAJE DE AGRADECIMIENTO*\n`;
-    message += `▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬\n`;
-    message += `¡Gracias por confiar en nosotros! 🙏\n`;
-    message += `Su satisfacción es nuestra prioridad 💯\n`;
-    message += `▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬\n\n`;
-    
-    // IMAGEN DEL CATÁLOGO AL FINAL CORREGIDA PARA QUE SE MUESTRE AUTOMÁTICAMENTE
-    message += `📸 *CATÁLOGO COMPLETO YERO SHOP!* 📸\n\n`;
-    
-    // Usar una imagen que se muestre automáticamente en WhatsApp
-    // Las imágenes de Pexels se muestran automáticamente como vista previa
-    message += `🖼️ *Ver nuestro catálogo completo:*\n`;
-    message += `https://images.pexels.com/photos/230544/pexels-photo-230544.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&fit=crop`;
+    message += `🌐 Web: https://yeroshop.vercel.app\n\n`;
+    message += `¡Gracias por confiar en nosotros! 🙏`;
 
     // Generar URLs según el dispositivo
     const whatsappUrls = generateWhatsAppURL(message, storeConfig.storeInfo?.whatsappNumber || '+53 54690878');
