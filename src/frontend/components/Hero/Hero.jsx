@@ -1,5 +1,6 @@
 import styles from './Hero.module.css';
 
+import jethalalBanner from '../../assets/lovepik.png';
 import { Link } from 'react-router-dom';
 import { useIsMobile } from '../../hooks';
 
@@ -24,7 +25,7 @@ const Hero = () => {
         {!isMobile && (
           <article className={styles.imageContainer}>
             <img
-              src="/lovepik.png"
+              src={jethalalBanner}
               alt="jethalal"
               className={styles.banner}
             />

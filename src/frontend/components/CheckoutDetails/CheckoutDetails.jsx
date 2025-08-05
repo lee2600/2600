@@ -335,14 +335,12 @@ const CheckoutDetails = ({
     const currency = getCurrentCurrency();
     const device = detectDevice();
     
-    // COORDENADAS ACTUALIZADAS DE LA TIENDA - Reparto Nuevo Vista Alegre
+    // Coordenadas de la tienda para mensajes de recogida
     const storeLocation = {
-      lat: 20.039585,
-      lng: -75.849663,
-      address: "Reparto Nuevo Vista Alegre, Santiago de Cuba, Cuba",
-      name: "Yero Shop!",
-      coordinates: "20.039585, -75.849663",
-      googleMapsUrl: "https://www.google.com/maps/place/20%C2%B002'22.5%22N+75%C2%B050'58.8%22W/@20.0394604,-75.8495414,180m/data=!3m1!1e3!4m4!3m3!8m2!3d20.039585!4d-75.849663?entry=ttu&g_ep=EgoyMDI1MDczMC4wIKXMDSoASAFQAw%3D%3D"
+      lat: 20.0247,
+      lng: -75.8219,
+      address: "Santiago de Cuba, Cuba",
+      name: "Yero Shop!"
     };
     
     console.log('🚀 Iniciando envío a WhatsApp...');
@@ -447,10 +445,7 @@ const CheckoutDetails = ({
       message += `📦 *Modalidad:* Recoger en tienda\n`;
       message += `🏪 *Ubicación:* Yero Shop! - Santiago de Cuba\n`;
       message += `📍 *Dirección exacta:* ${storeLocation.address}\n`;
-      message += `🗺️ *Coordenadas GPS:* ${storeLocation.coordinates}\n`;
-      message += `🗺️ *Ver ubicación en Google Maps:* ${storeLocation.googleMapsUrl}\n`;
-      message += `🍎 *Apple Maps:* http://maps.apple.com/?q=${storeLocation.lat},${storeLocation.lng}\n`;
-      message += `🚗 *Waze:* https://waze.com/ul?ll=${storeLocation.lat},${storeLocation.lng}\n`;
+      message += `🗺️ *Ver ubicación:* https://maps.app.goo.gl/UjYnYjt2LQa2YGdx8\n`;
       if (selectedAddress.additionalInfo) {
         message += `📝 *Información adicional:* ${selectedAddress.additionalInfo}\n`;
       }

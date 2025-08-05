@@ -5,23 +5,16 @@ const StoreLocationMap = () => {
   const [userLocation, setUserLocation] = useState(null);
   const [distance, setDistance] = useState(null);
   const [isLoadingLocation, setIsLoadingLocation] = useState(false);
-  const [travelTimes, setTravelTimes] = useState({
-    walking: null,
-    cycling: null,
-    electricBike: null,
-    driving: null
-  });
 
-  // COORDENADAS ACTUALIZADAS DE LA TIENDA - Reparto Nuevo Vista Alegre
+  // Coordenadas de la tienda (extraídas del enlace de Google Maps)
   const storeLocation = {
-    lat: 20.039585,
-    lng: -75.849663,
-    address: "Reparto Nuevo Vista Alegre, Santiago de Cuba",
-    name: "Yero Shop!",
-    fullAddress: "Reparto Nuevo Vista Alegre, Santiago de Cuba, Cuba"
+    lat: 20.0247,
+    lng: -75.8219,
+    address: "Santiago de Cuba, Cuba",
+    name: "Yero Shop!"
   };
 
-  // Función para calcular distancia entre dos puntos (Haversine formula)
+  // Función para calcular distancia entre dos puntos
   const calculateDistance = (lat1, lon1, lat2, lon2) => {
     const R = 6371; // Radio de la Tierra en km
     const dLat = (lat2 - lat1) * Math.PI / 180;
@@ -33,51 +26,6 @@ const StoreLocationMap = () => {
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
     const distance = R * c;
     return distance;
-  };
-
-  // FUNCIÓN MEJORADA PARA CALCULAR TIEMPOS DE VIAJE SEGÚN MEDIO DE TRANSPORTE
-  const calculateTravelTimes = (distanceKm) => {
-    // Velocidades promedio en km/h para Santiago de Cuba
-    const speeds = {
-      walking: 4.5,        // Caminando en ciudad
-      cycling: 12,         // Bicicleta de pedales en ciudad
-      electricBike: 20,    // Bicicleta eléctrica en ciudad
-      driving: 25          // Automóvil en ciudad (considerando tráfico urbano)
-    };
-
-    const times = {};
-    Object.keys(speeds).forEach(method => {
-      const timeHours = distanceKm / speeds[method];
-      const timeMinutes = Math.ceil(timeHours * 60);
-      times[method] = timeMinutes;
-    });
-
-    return times;
-  };
-
-  // FUNCIÓN PARA FORMATEAR TIEMPO DE VIAJE CON EMOJIS
-  const formatTravelTime = (minutes, method) => {
-    const icons = {
-      walking: '🚶‍♂️',
-      cycling: '🚴‍♂️',
-      electricBike: '🚴‍♂️⚡',
-      driving: '🚗'
-    };
-
-    const labels = {
-      walking: 'Caminando',
-      cycling: 'Bicicleta',
-      electricBike: 'Bici Eléctrica',
-      driving: 'Automóvil'
-    };
-
-    if (minutes < 60) {
-      return `${icons[method]} ${labels[method]}: ${minutes} min`;
-    } else {
-      const hours = Math.floor(minutes / 60);
-      const remainingMinutes = minutes % 60;
-      return `${icons[method]} ${labels[method]}: ${hours}h ${remainingMinutes}min`;
-    }
   };
 
   // Obtener ubicación del usuario
@@ -106,11 +54,6 @@ const StoreLocationMap = () => {
         );
         
         setDistance(dist);
-        
-        // Calcular tiempos de viaje para diferentes medios de transporte
-        const times = calculateTravelTimes(dist);
-        setTravelTimes(times);
-        
         setIsLoadingLocation(false);
       },
       (error) => {
@@ -126,7 +69,7 @@ const StoreLocationMap = () => {
     );
   };
 
-  // URLs para diferentes aplicaciones de mapas CON COORDENADAS ACTUALIZADAS
+  // URLs para diferentes aplicaciones de mapas
   const getDirectionsUrls = () => {
     const storeCoords = `${storeLocation.lat},${storeLocation.lng}`;
     const userCoords = userLocation ? `${userLocation.lat},${userLocation.lng}` : '';
@@ -134,7 +77,7 @@ const StoreLocationMap = () => {
     return {
       googleMaps: userLocation 
         ? `https://www.google.com/maps/dir/${userCoords}/${storeCoords}`
-        : `https://www.google.com/maps/place/20%C2%B002'22.5%22N+75%C2%B050'58.8%22W/@20.0394604,-75.8495414,180m/data=!3m1!1e3!4m4!3m3!8m2!3d20.039585!4d-75.849663?entry=ttu&g_ep=EgoyMDI1MDczMC4wIKXMDSoASAFQAw%3D%3D`,
+        : `https://www.google.com/maps/search/?api=1&query=${storeCoords}`,
       appleMaps: userLocation
         ? `http://maps.apple.com/?saddr=${userCoords}&daddr=${storeCoords}`
         : `http://maps.apple.com/?q=${storeCoords}`,
@@ -148,48 +91,34 @@ const StoreLocationMap = () => {
 
   return (
     <div className={styles.storeLocationMap}>
-      {/* Mapa embebido de Google Maps CON COORDENADAS ACTUALIZADAS */}
+      {/* Mapa embebido de Google Maps */}
       <div className={styles.mapContainer}>
         <iframe
-          src={`https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3664.8!2d${storeLocation.lng}!3d${storeLocation.lat}!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2z${encodeURIComponent('20°02\'22.5"N 75°50\'58.8"W')}!5e0!3m2!1ses!2scu!4v1640000000000!5m2!1ses!2scu&zoom=18`}
+          src={`https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3664.8!2d${storeLocation.lng}!3d${storeLocation.lat}!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjDCsDAxJzI5LjAiTiA3NcKwNDknMTkuMCJX!5e0!3m2!1ses!2scu!4v1640000000000!5m2!1ses!2scu&zoom=15`}
           width="100%"
-          height="300"
+          height="250"
           style={{ border: 0 }}
           allowFullScreen=""
           loading="lazy"
           referrerPolicy="no-referrer-when-downgrade"
-          title="Ubicación de Yero Shop! - Reparto Nuevo Vista Alegre"
+          title="Ubicación de Yero Shop!"
         ></iframe>
       </div>
 
-      {/* Información de la tienda ACTUALIZADA */}
+      {/* Información de la tienda */}
       <div className={styles.storeInfo}>
         <h4>🏪 {storeLocation.name}</h4>
-        <p>📍 {storeLocation.fullAddress}</p>
+        <p>📍 {storeLocation.address}</p>
         <p>📞 WhatsApp: +53 54690878</p>
-        <div className={styles.coordinates}>
-          <p>🗺️ Coordenadas: {storeLocation.lat}, {storeLocation.lng}</p>
-        </div>
         
         {distance && (
           <div className={styles.distanceInfo}>
             <p className={styles.distance}>
-              📏 Distancia: <strong>{distance.toFixed(2)} km</strong>
+              📏 Distancia aproximada: <strong>{distance.toFixed(2)} km</strong>
             </p>
-            
-            {/* TIEMPOS DE VIAJE MEJORADOS POR MEDIO DE TRANSPORTE */}
-            <div className={styles.travelTimesContainer}>
-              <h5>⏱️ Tiempos de viaje estimados:</h5>
-              <div className={styles.travelTimesList}>
-                {Object.keys(travelTimes).map(method => (
-                  travelTimes[method] && (
-                    <div key={method} className={styles.travelTimeItem}>
-                      <span>{formatTravelTime(travelTimes[method], method)}</span>
-                    </div>
-                  )
-                ))}
-              </div>
-            </div>
+            <p className={styles.travelTime}>
+              🚗 Tiempo estimado: <strong>{Math.ceil(distance * 3)} minutos</strong>
+            </p>
           </div>
         )}
       </div>
@@ -207,7 +136,7 @@ const StoreLocationMap = () => {
               Obteniendo ubicación...
             </span>
           ) : (
-            '📍 Calcular Distancia y Tiempos'
+            '📍 Calcular Distancia'
           )}
         </button>
 
@@ -241,17 +170,14 @@ const StoreLocationMap = () => {
         </div>
       </div>
 
-      {/* Instrucciones adicionales ACTUALIZADAS */}
+      {/* Instrucciones adicionales */}
       <div className={styles.instructions}>
         <h5>📋 Instrucciones para llegar:</h5>
         <ul>
-          <li>🗺️ <strong>Ubicación exacta:</strong> Reparto Nuevo Vista Alegre, Santiago de Cuba</li>
-          <li>📍 <strong>Coordenadas GPS:</strong> 20.039585, -75.849663</li>
-          <li>🚗 Puedes usar cualquier aplicación de mapas con las coordenadas</li>
-          <li>📞 Llama al +53 54690878 si necesitas ayuda para llegar</li>
+          <li>🚗 Puedes usar cualquier aplicación de mapas</li>
+          <li>📞 Llama al +53 54690878 si necesitas ayuda</li>
           <li>🕒 Horario de atención: Lunes a Domingo</li>
-          <li>🅿️ Estacionamiento disponible en la zona</li>
-          <li>🚌 Acceso por transporte público disponible</li>
+          <li>🅿️ Estacionamiento disponible cerca</li>
         </ul>
       </div>
     </div>
