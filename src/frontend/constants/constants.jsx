@@ -114,7 +114,7 @@ export const SERVICE_TYPES = {
 // Zonas de Santiago de Cuba con costos de entrega - ACTUALIZADAS
 export const SANTIAGO_ZONES = [
   {
-    "id": "centro",
+    "id": "nuevo_vista_alegre",
     "name": "Nuevo Vista Alegre",
     "cost": 100
   },
