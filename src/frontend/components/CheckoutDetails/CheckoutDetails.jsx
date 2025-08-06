@@ -332,201 +332,127 @@ const CheckoutDetails = ({
 
   const sendToWhatsApp = async (orderData) => {
     const orderNumber = generateOrderNumber();
-    const currency = getCurrentCurrency();
     const device = detectDevice();
-    
-    // Coordenadas de la tienda para mensajes de recogida
-    const storeLocation = {
-      lat: 20.0247,
-      lng: -75.8219,
-      address: "Santiago de Cuba, Cuba",
-      name: "Yero Shop!"
-    };
     
     console.log('🚀 Iniciando envío a WhatsApp...');
     console.log('📱 Dispositivo:', device);
     console.log('📞 Número de WhatsApp:', storeConfig.storeInfo?.whatsappNumber || '+53 54690878');
     
-    // FUNCIÓN PARA CONVERTIR CÓDIGO DE COLOR A NOMBRE
-    const getColorName = (colorCode) => {
-      const colorMap = {
-        '#000000': 'Negro',
-        '#ffffff': 'Blanco',
-        '#ff0000': 'Rojo',
-        '#00ff00': 'Verde',
-        '#0000ff': 'Azul',
-        '#ffff00': 'Amarillo',
-        '#ff00ff': 'Magenta',
-        '#00ffff': 'Cian',
-        '#ffa500': 'Naranja',
-        '#800080': 'Púrpura',
-        '#ffc0cb': 'Rosa',
-        '#a52a2a': 'Marrón',
-        '#808080': 'Gris',
-        '#c0c0c0': 'Plata',
-        '#ffd700': 'Dorado',
-        '#008000': 'Verde Oscuro',
-        '#000080': 'Azul Marino',
-        '#800000': 'Granate',
-        '#808000': 'Oliva',
-        '#008080': 'Verde Azulado'
-      };
-      
-      // Buscar color exacto
-      if (colorMap[colorCode.toLowerCase()]) {
-        return colorMap[colorCode.toLowerCase()];
-      }
-      
-      // Si no encuentra el color exacto, intentar aproximación por rangos
-      const hex = colorCode.replace('#', '');
-      const r = parseInt(hex.substr(0, 2), 16);
-      const g = parseInt(hex.substr(2, 2), 16);
-      const b = parseInt(hex.substr(4, 2), 16);
-      
-      // Determinar color dominante
-      if (r > g && r > b) {
-        if (r > 200) return 'Rojo Claro';
-        if (r > 100) return 'Rojo';
-        return 'Rojo Oscuro';
-      } else if (g > r && g > b) {
-        if (g > 200) return 'Verde Claro';
-        if (g > 100) return 'Verde';
-        return 'Verde Oscuro';
-      } else if (b > r && b > g) {
-        if (b > 200) return 'Azul Claro';
-        if (b > 100) return 'Azul';
-        return 'Azul Oscuro';
-      } else if (r === g && g === b) {
-        if (r > 200) return 'Blanco';
-        if (r > 100) return 'Gris';
-        return 'Negro';
-      }
-      
-      return `Color Personalizado (${colorCode})`;
-    };
-    
-    // CATÁLOGO PROFESIONAL CON IMAGEN AUTOMÁTICA
+    // ENCABEZADO PROFESIONAL
     let message = `🏪 *YERO SHOP!* - Tu tienda online de confianza\n\n`;
     
-    // Separadores visuales cortos y elegantes
-    message += `-----------------------\n`;
-    message += `🛍️ *CATÁLOGO DIGITAL PROFESIONAL* 🛍️\n`;
-    message += `-----------------------\n\n`;
-    
     // Número de orden con diseño moderno
-    message += `✨ ----------------------- ✨\n`;
-    message += `🎯 *NUEVO PEDIDO*\n`;
-    message += `🔥 *#${orderNumber}* 🔥\n`;
-    message += `✨ ----------------------- ✨\n\n`;
+    message += `✨ -------------------------------- ✨\n`;
+    message += `🎯 *NUEVO PEDIDO #${orderNumber}* 🔥\n`;
+    message += `✨ -------------------------------- ✨\n\n`;
     
-    message += `-----------------------\n`;
+    message += `--------------------------------------------\n`;
     message += `👤 *INFORMACIÓN DEL CLIENTE*\n`;
-    message += `-----------------------\n`;
-    message += `📝 *Nombre Completo:* ${firstName} ${lastName}\n`;
-    message += `📧 *Correo Electrónico:* ${email}\n`;
-    message += `💱 *Moneda seleccionada:* ${currency.flag} ${currency.name} (${currency.code})\n\n`;
+    message += `--------------------------------------------\n`;
+    message += `📝 *Nombre:* ${firstName} ${lastName}\n`;
+    message += `📧 *Email:* ${email}\n`;
+    message += `📱 *Móvil:* ${selectedAddress.mobile}\n\n`;
     
-    // Información del servicio con mejor formato
-    message += `-----------------------\n`;
+    // DETALLES DE ENTREGA MEJORADOS Y ORGANIZADOS
+    message += `--------------------------------------------\n`;
     message += `🚚 *DETALLES DE ENTREGA*\n`;
-    message += `-----------------------\n`;
-    message += `👤 *Nombre Completo del Cliente:* ${selectedAddress.username}\n`;
-    message += `📱 *Número de Móvil del Cliente:* ${selectedAddress.mobile}\n`;
+    message += `--------------------------------------------\n`;
     
     if (selectedAddress.serviceType === SERVICE_TYPES.HOME_DELIVERY) {
       const zoneName = SANTIAGO_ZONES.find(z => z.id === selectedAddress.zone)?.name;
       message += `📦 *Modalidad:* Entrega a domicilio\n`;
-      message += `📍 *Zona de entrega:* ${zoneName}\n`;
-      message += `🏠 *Dirección completa:* ${selectedAddress.addressInfo}\n`;
-      message += `👤 *Persona que recibe:* ${selectedAddress.receiverName}\n`;
-      message += `📱 *Teléfono del receptor:* ${selectedAddress.receiverPhone}\n`;
-      message += `💰 *Costo de entrega:* ${formatPriceWithCode(deliveryCost)}\n`;
+      message += `📍 *Zona:* ${zoneName}\n`;
+      message += `🏠 *Dirección:* ${selectedAddress.addressInfo}\n`;
+      message += `👤 *¿Quién recibe el pedido?:* ${selectedAddress.receiverName}\n`;
+      message += `📞 *Teléfono de quien recibe:* ${selectedAddress.receiverPhone}\n`;
     } else {
       message += `📦 *Modalidad:* Recoger en tienda\n`;
-      message += `🏪 *Ubicación:* Yero Shop! - Santiago de Cuba\n`;
-      message += `📍 *Dirección exacta:* ${storeLocation.address}\n`;
-      message += `🗺️ *Ver ubicación:* https://maps.app.goo.gl/UjYnYjt2LQa2YGdx8\n`;
+      message += `🏪 *Ubicación:* Reparto Nuevo Vista Alegre, Santiago de Cuba\n`;
+      message += `📍 *Coordenadas:* 20.039585, -75.849663\n`;
+      
+      // Agregar información de distancia si está disponible
+      if (selectedAddress.distanceMessage) {
+        message += `\n${selectedAddress.distanceMessage}`;
+      } else {
+        message += `🗺️ *Google Maps:* https://www.google.com/maps/place/20%C2%B002'22.5%22N+75%C2%B050'58.8%22W/@20.0394604,-75.8495414,180m\n`;
+        message += `🍎 *Apple Maps:* https://maps.apple.com/?q=20.039585,-75.849663\n`;
+        message += `🚗 *Waze:* https://waze.com/ul?q=20.039585,-75.849663\n`;
+      }
+      
       if (selectedAddress.additionalInfo) {
-        message += `📝 *Información adicional:* ${selectedAddress.additionalInfo}\n`;
+        message += `📝 *Info adicional:* ${selectedAddress.additionalInfo}\n`;
       }
     }
     
     message += `\n`;
     
-    // Productos con iconos y mejor formato MEJORADO
-    message += `-----------------------\n`;
+    // PRODUCTOS ORGANIZADOS Y DETALLADOS
+    message += `--------------------------------------------\n`;
     message += `🛍️ *PRODUCTOS SOLICITADOS*\n`;
-    message += `-----------------------\n`;
+    message += `--------------------------------------------\n`;
     cartFromContext.forEach((item, index) => {
       const productIcon = getProductIcon(item.category);
-      const colorCode = item.colors[0]?.color || '#000000';
-      const colorName = getColorName(colorCode);
+      const colorHex = item.colors[0]?.color || '#000000';
       const subtotal = item.price * item.qty;
       
       message += `${index + 1}. ${productIcon} *${item.name}*\n`;
-      message += `   🎨 *Color:* ${colorName}\n`;
-      message += `   📊 *Cantidad:* ${item.qty} unidad${item.qty > 1 ? 'es' : ''}\n`;
-      message += `   💵 *Precio unitario:* ${formatPriceWithCode(item.price)}\n`;
-      message += `   💰 *Subtotal:* ${formatPriceWithCode(subtotal)}\n`;
-      message += `   -----------------------\n`;
+      message += `    🎨 Color: ${colorHex} | 📊 Cantidad: ${item.qty}\n`;
+      message += `    💵 Precio: ${formatPriceWithCode(item.price)} | 💰 Subtotal: ${formatPriceWithCode(subtotal)}\n`;
+      if (index < cartFromContext.length - 1) {
+        message += `    --------------------------------\n`;
+      }
     });
     
-    // Resumen financiero profesional MEJORADO Y ORGANIZADO
-    message += `\n-----------------------\n`;
-    message += `💳 *RESUMEN FINANCIERO DETALLADO*\n`;
-    message += `-----------------------\n`;
+    // RESUMEN FINANCIERO ORGANIZADO Y DETALLADO
+    message += `\n--------------------------------------------\n`;
+    message += `💳 *RESUMEN FINANCIERO*\n`;
+    message += `--------------------------------------------\n`;
     message += `🛍️ *Subtotal productos:* ${formatPriceWithCode(totalAmountFromContext)}\n`;
     
     if (activeCoupon) {
-      message += `🎫 *Descuento aplicado:*\n`;
-      message += `    • Cupón: ${activeCoupon.couponCode}\n`;
-      message += `    • Porcentaje: ${activeCoupon.discountPercent}%\n`;
-      message += `    • Ahorro: -${formatPriceWithCode(Math.abs(priceAfterCouponApplied))}\n`;
+      message += `🎫 *Descuento aplicado (${activeCoupon.couponCode} - ${activeCoupon.discountPercent}%):* -${formatPriceWithCode(Math.abs(priceAfterCouponApplied))}\n`;
     }
     
     if (deliveryCost > 0) {
       message += `🚚 *Costo de entrega:* ${formatPriceWithCode(deliveryCost)}\n`;
-    } else {
-      message += `🚚 *Costo de entrega:* GRATIS (Recogida en tienda)\n`;
     }
     
-    message += `-----------------------\n`;
-    message += `💰 *TOTAL A PAGAR:* ${formatPriceWithCode(finalPriceToPay)}\n`;
-    message += `💱 *Moneda:* ${currency.flag} ${currency.name} (${currency.code})\n`;
-    message += `-----------------------\n\n`;
+    message += `--------------------------------------------\n`;
+    message += `💰 *TOTAL A PAGAR: ${formatPriceWithCode(finalPriceToPay)}*\n`;
+    message += `💱 *Moneda:* ${getCurrentCurrency().flag} ${getCurrentCurrency().name} (${getCurrentCurrency().code})\n`;
+    message += `--------------------------------------------\n\n`;
     
-    // Información adicional profesional - RESUMIDA
-    message += `-----------------------\n`;
-    message += `📅 *Fecha y hora del pedido:*\n`;
-    message += `-----------------------\n`;
+    // FECHA Y HORA
+    message += `--------------------------------------------\n`;
+    message += `📅 *FECHA Y HORA DEL PEDIDO*\n`;
+    message += `--------------------------------------------\n`;
     message += `${new Date().toLocaleString('es-CU', {
-      weekday: 'short',
-      year: '2-digit',
-      month: 'short',
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
       day: 'numeric',
       hour: '2-digit',
       minute: '2-digit',
       timeZone: 'America/Havana'
     })}\n\n`;
     
-    // Instrucciones importantes RESUMIDAS
-    message += `-----------------------\n`;
-    message += `📋 *INSTRUCCIONES:*\n`;
-    message += `-----------------------\n`;
-    message += `✅ Confirmar disponibilidad\n`;
-    message += `📍 Verificar dirección/recogida\n`;
-    message += `⏰ Coordinar horario\n`;
-    message += `🔢 *Número de referencia:* #${orderNumber}\n`;
-    message += `📞 *Contacto:* ${storeConfig.storeInfo?.whatsappNumber || '+53 54690878'}\n\n`;
+    // INSTRUCCIONES
+    message += `--------------------------------------------\n`;
+    message += `📋 *INSTRUCCIONES IMPORTANTES*\n`;
+    message += `--------------------------------------------\n`;
+    message += `• Confirme la disponibilidad de los productos\n`;
+    message += `• Verifique la dirección de entrega\n`;
+    message += `• Coordine horario de entrega/recogida\n`;
+    message += `• Mantenga este número de pedido: #${orderNumber}\n\n`;
     
-    message += `-----------------------\n`;
-    message += `🏪 *YERO SHOP!*\n`;
-    message += `-----------------------\n`;
+    message += `--------------------------------------------\n`;
+    message += `🏪 *INFORMACIÓN DE LA TIENDA*\n`;
+    message += `--------------------------------------------\n`;
     message += `🏪 *Yero Shop!*\n`;
-    message += `"Tu tienda online de confianza" ✨\n`;
-    message += `📍 Santiago de Cuba, Cuba\n`;
+    message += `📍 Reparto Nuevo Vista Alegre, Santiago de Cuba\n`;
     message += `📱 WhatsApp: ${storeConfig.storeInfo?.whatsappNumber || '+53 54690878'}\n`;
-    message += `🌐 Web: https://yeroshop.vercel.app\n\n`;
+    message += `🌐 Tienda online: https://yeroshop.vercel.app\n`;
+    message += `🗺️ Coordenadas: 20.039585, -75.849663\n\n`;
     message += `¡Gracias por confiar en nosotros! 🙏`;
 
     // Generar URLs según el dispositivo

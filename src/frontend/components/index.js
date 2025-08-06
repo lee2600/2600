@@ -22,7 +22,7 @@ import CheckoutDetails from './CheckoutDetails/CheckoutDetails';
 import Modal from './Modal/Modal';
 import Error from './Error/Error';
 import Loader from './Loader';
-import StoreLocationMap from './StoreLocationMap/StoreLocationMap';
+import DistanceCalculator from './DistanceCalculator/DistanceCalculator';
 
 export {
   Navbar,
@@ -49,5 +49,5 @@ export {
   Modal,
   Error,
   Loader,
-  StoreLocationMap,
+  DistanceCalculator,
 };
