@@ -20,8 +20,9 @@ const AddressForm = ({
   onClose, 
   onAddressAdded 
 }) => {
-  const { config } = useConfigContext();
+  const { storeConfig } = useConfigContext();
   const { allProducts } = useAllProductsContext();
+  const SANTIAGO_ZONES = storeConfig.zones || [];
 
   const [inputs, setInputs] = useState({
     name: '',
