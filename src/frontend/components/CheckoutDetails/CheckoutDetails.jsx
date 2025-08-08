@@ -12,6 +12,8 @@ import { toastHandler, Popper, generateOrderNumber } from '../../utils/utils';
 
 import { useAuthContext } from '../../contexts/AuthContextProvider';
 import { useNavigate } from 'react-router-dom';
+import PaymentMethodSelector from '../PaymentMethodSelector/PaymentMethodSelector';
+import { PAYMENT_TYPES, BANK_TRANSFER_SURCHARGE } from '../../constants/constants';
 
 const CheckoutDetails = ({
   timer,
@@ -38,6 +40,7 @@ const CheckoutDetails = ({
   const navigate = useNavigate();
   const [activeCoupon, setActiveCoupon] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(PAYMENT_TYPES.CASH);
 
   // Obtener la dirección seleccionada
   const selectedAddress = addressListFromContext.find(
@@ -54,11 +57,17 @@ const CheckoutDetails = ({
     ? -Math.floor((totalAmountFromContext * activeCoupon.discountPercent) / 100)
     : 0;
 
+  // Calcular recargo por transferencia bancaria (20% sobre el subtotal)
+  const bankTransferSurcharge = selectedPaymentMethod === PAYMENT_TYPES.BANK_TRANSFER
+    ? Math.floor((totalAmountFromContext * BANK_TRANSFER_SURCHARGE) / 100)
+    : 0;
+
   const finalPriceToPay =
     totalAmountFromContext +
     deliveryCost +
     CHARGE_AND_DISCOUNT.discount +
-    priceAfterCouponApplied;
+    priceAfterCouponApplied +
+    bankTransferSurcharge;
 
   const updateActiveCoupon = (couponObjClicked) => {
     setActiveCoupon(couponObjClicked);
@@ -75,6 +84,21 @@ const CheckoutDetails = ({
   const cancelCoupon = () => {
     toastHandler(ToastType.Warn, `🗑️ Cupón removido - Descuento cancelado`);
     setActiveCoupon(null);
+  };
+
+  const handlePaymentMethodChange = (paymentMethod) => {
+    setSelectedPaymentMethod(paymentMethod);
+    
+    const currency = getCurrentCurrency();
+    if (paymentMethod === PAYMENT_TYPES.BANK_TRANSFER) {
+      const surchargeAmount = Math.floor((totalAmountFromContext * BANK_TRANSFER_SURCHARGE) / 100);
+      toastHandler(
+        ToastType.Info, 
+        `🏦 Transferencia bancaria seleccionada: +${BANK_TRANSFER_SURCHARGE}% recargo (${formatPriceWithCode(surchargeAmount)})`
+      );
+    } else {
+      toastHandler(ToastType.Success, '💵 Pago en efectivo seleccionado: sin recargos adicionales');
+    }
   };
 
   // Función para obtener icono según categoría del producto
@@ -436,6 +460,28 @@ const CheckoutDetails = ({
     
     message += `\n`;
     
+    // INFORMACIÓN DE MÉTODO DE PAGO
+    message += `═══════════════════════════════════════════════════════\n`;
+    message += `💳 *MÉTODO DE PAGO SELECCIONADO*\n`;
+    message += `═══════════════════════════════════════════════════════\n`;
+    if (selectedPaymentMethod === PAYMENT_TYPES.CASH) {
+      message += `💵 *Modalidad de Pago:* Pago en Efectivo\n`;
+      message += `🏪 *Lugar de Pago:* Directamente en la tienda\n`;
+      message += `✅ *Ventajas:* Sin recargos adicionales\n`;
+      message += `📝 *Instrucciones:* Pagar al momento de la entrega o recogida\n`;
+    } else {
+      message += `🏦 *Modalidad de Pago:* Transferencia Bancaria\n`;
+      message += `⚠️ *Recargo Aplicado:* ${BANK_TRANSFER_SURCHARGE}% adicional sobre productos\n`;
+      message += `💰 *Monto del Recargo:* ${formatPriceWithCode(bankTransferSurcharge)}\n`;
+      message += `📋 *Instrucciones de Transferencia:*\n`;
+      message += `   1️⃣ Realizar transferencia por el monto total indicado\n`;
+      message += `   2️⃣ Enviar comprobante de transferencia por WhatsApp\n`;
+      message += `   3️⃣ Esperar confirmación de pago recibido\n`;
+      message += `   4️⃣ Coordinar entrega o recogida una vez confirmado\n`;
+      message += `🔒 *Seguridad:* Pago anticipado y verificado\n`;
+    }
+    message += `\n`;
+    
     // Productos con iconos y mejor formato MEJORADO
     message += `═══════════════════════════════════════════════════════\n`;
     message += `🛍️ *PRODUCTOS SOLICITADOS*\n`;
@@ -460,6 +506,11 @@ const CheckoutDetails = ({
     message += `═══════════════════════════════════════════════════════\n`;
     message += `🛍️ *Subtotal productos:* ${formatPriceWithCode(totalAmountFromContext)}\n`;
     
+    // Mostrar recargo de transferencia bancaria si aplica
+    if (selectedPaymentMethod === PAYMENT_TYPES.BANK_TRANSFER && bankTransferSurcharge > 0) {
+      message += `🏦 *Recargo transferencia bancaria (${BANK_TRANSFER_SURCHARGE}%):* +${formatPriceWithCode(bankTransferSurcharge)}\n`;
+    }
+    
     if (activeCoupon) {
       message += `🎫 *Descuento aplicado:*\n`;
       message += `    • Cupón: ${activeCoupon.couponCode}\n`;
@@ -476,6 +527,7 @@ const CheckoutDetails = ({
     message += `═══════════════════════════════════════════════════════\n`;
     message += `💰 *TOTAL A PAGAR:* ${formatPriceWithCode(finalPriceToPay)}\n`;
     message += `💱 *Moneda:* ${currency.flag} ${currency.name} (${currency.code})\n`;
+    message += `💳 *Método de Pago:* ${selectedPaymentMethod === PAYMENT_TYPES.CASH ? 'Efectivo en tienda' : 'Transferencia bancaria (con recargo)'}\n`;
     message += `═══════════════════════════════════════════════════════\n\n`;
     
     // Información adicional profesional
@@ -598,6 +650,8 @@ const CheckoutDetails = ({
           subtotal: totalAmountFromContext,
           deliveryCost,
           coupon: activeCoupon,
+          paymentMethod: selectedPaymentMethod,
+          bankTransferSurcharge,
           total: finalPriceToPay
         }
       });
@@ -646,6 +700,15 @@ const CheckoutDetails = ({
           <Price amount={totalAmountFromContext} />
         </div>
 
+        {selectedPaymentMethod === PAYMENT_TYPES.BANK_TRANSFER && (
+          <div className={styles.row}>
+            <span>🏦 Recargo transferencia bancaria ({BANK_TRANSFER_SURCHARGE}%)</span>
+            <span className={styles.surchargeAmount}>
+              +<Price amount={bankTransferSurcharge} />
+            </span>
+          </div>
+        )}
+
         {activeCoupon && (
           <div className={styles.row}>
             <div className={styles.couponApplied}>
@@ -679,6 +742,13 @@ const CheckoutDetails = ({
         <span>💰 Precio Total</span>
         <Price amount={finalPriceToPay} />
       </div>
+
+      <PaymentMethodSelector
+        selectedPaymentMethod={selectedPaymentMethod}
+        onPaymentMethodChange={handlePaymentMethodChange}
+        cartTotal={totalAmountFromContext}
+        bankTransferSurcharge={bankTransferSurcharge}
+      />
 
       <button 
         onClick={handlePlaceOrder} 

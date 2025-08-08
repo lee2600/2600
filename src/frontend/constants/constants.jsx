@@ -111,6 +111,15 @@ export const SERVICE_TYPES = {
   PICKUP: 'pickup'
 };
 
+// Tipos de pago
+export const PAYMENT_TYPES = {
+  CASH: 'cash',
+  BANK_TRANSFER: 'bank_transfer'
+};
+
+// Recargo por transferencia bancaria
+export const BANK_TRANSFER_SURCHARGE = 20; // 20% adicional
+
 // Zonas de Santiago de Cuba con costos de entrega - ACTUALIZADAS
 export const SANTIAGO_ZONES = [
   {

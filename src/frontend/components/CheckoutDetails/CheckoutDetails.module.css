@@ -430,3 +430,8 @@
 .couponText {
   margin: 0;
 }
+
+.surchargeAmount {
+  color: #f59e0b;
+  font-weight: 600;
+}
