@@ -150,6 +150,20 @@
   width: fit-content;
 }
 
+@media screen and (min-width: 768px) {
+  .paymentMethods {
+    flex-direction: row;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  
+  .paymentCash,
+  .paymentTransfer {
+    font-size: 1rem;
+    padding: 0.75rem 1.25rem;
+  }
+}
+
 .color .productContent hr {
   margin-bottom: 1rem;
 }

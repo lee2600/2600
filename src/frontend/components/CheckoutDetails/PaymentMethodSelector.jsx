@@ -36,6 +36,7 @@ const PaymentMethodSelector = ({
     let cashTotal = 0;
     let transferTotal = 0;
     let transferFees = 0;
+    let transferSubtotal = 0;
 
     cartItems.forEach(item => {
       const paymentType = item.paymentType || 'both';
@@ -49,16 +50,17 @@ const PaymentMethodSelector = ({
 
       // Para transferencia
       if (paymentType === 'transfer' || paymentType === 'both') {
+        transferSubtotal += itemTotal;
         const fee = (itemTotal * transferFeePercentage) / 100;
         transferFees += fee;
         transferTotal += itemTotal + fee;
       }
     });
 
-    return { cashTotal, transferTotal, transferFees };
+    return { cashTotal, transferTotal, transferFees, transferSubtotal };
   };
 
-  const { cashTotal, transferTotal, transferFees } = calculatePaymentTotals();
+  const { cashTotal, transferTotal, transferFees, transferSubtotal } = calculatePaymentTotals();
 
   const handlePaymentMethodChange = (method) => {
     setSelectedPaymentMethod(method);
@@ -149,17 +151,17 @@ const PaymentMethodSelector = ({
             {availablePaymentMethods.transfer && (
               <div className={styles.transferBreakdown}>
                 <div className={styles.breakdownRow}>
-                  <span>Subtotal productos:</span>
-                  <Price amount={cashTotal} />
+                  <span>📦 Subtotal productos:</span>
+                  <Price amount={transferSubtotal} />
                 </div>
                 {transferFees > 0 && (
                   <div className={styles.breakdownRow}>
-                    <span>Recargo por transferencia:</span>
+                    <span>💳 Recargo por transferencia:</span>
                     <Price amount={transferFees} />
                   </div>
                 )}
                 <div className={`${styles.breakdownRow} ${styles.totalRow}`}>
-                  <span className={styles.totalLabel}>Total con transferencia:</span>
+                  <span className={styles.totalLabel}>💰 Total con transferencia:</span>
                   <Price amount={transferTotal} />
                 </div>
               </div>
@@ -178,13 +180,19 @@ const PaymentMethodSelector = ({
         <h5>ℹ️ Información sobre Métodos de Pago</h5>
         <div className={styles.infoList}>
           <div className={styles.infoItem}>
-            <strong>💰 Pago en Efectivo:</strong> Sin recargos adicionales, pago directo al recibir
+            <strong>💰 Pago en Efectivo:</strong> Sin recargos adicionales, precio normal según la moneda seleccionada
           </div>
           <div className={styles.infoItem}>
-            <strong>💳 Transferencia Bancaria:</strong> Incluye recargo según configuración de cada producto
+            <strong>💳 Transferencia Bancaria:</strong> Incluye recargo calculado automáticamente según cada producto y convertido a la moneda seleccionada
           </div>
           <div className={styles.infoItem}>
-            <strong>🔒 Restricciones:</strong> Algunos productos pueden tener métodos de pago específicos
+            <strong>🔒 Restricciones:</strong> Los métodos disponibles dependen de los productos en el carrito
+          </div>
+          <div className={styles.infoItem}>
+            <strong>💱 Conversión Automática:</strong> Todos los precios, recargos y totales se convierten automáticamente a la moneda seleccionada usando las tasas configuradas
+          </div>
+          <div className={styles.infoItem}>
+            <strong>📊 Desglose Completo:</strong> El sistema muestra automáticamente el subtotal, recargos y total final según el método de pago elegido
           </div>
         </div>
       </div>

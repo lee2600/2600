@@ -139,6 +139,8 @@
   font-size: 0.75rem;
   font-weight: 600;
   border: 1px solid var(--primary-300);
+  line-height: 1.4;
+  text-align: center;
 }
 
 @media screen and (min-width: 768px) {
@@ -197,5 +199,6 @@
   .paymentBoth {
     font-size: 0.85rem;
     padding: 0.35rem 1rem;
+    line-height: 1.5;
   }
 }

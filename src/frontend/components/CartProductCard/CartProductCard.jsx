@@ -31,6 +31,9 @@ const CartProductCard = ({ singleCartItem }) => {
   // Obtener información de pago
   const paymentType = singleCartItem.paymentType || 'both';
   const transferFeePercentage = singleCartItem.transferFeePercentage || 5;
+  
+  // Calcular precio con transferencia para mostrar información completa
+  const transferPrice = price * (1 + transferFeePercentage / 100);
 
   const { color, colorQuantity } = colors[0];
 
@@ -97,12 +100,12 @@ const CartProductCard = ({ singleCartItem }) => {
             )}
             {paymentType === 'transfer' && (
               <span className={styles.paymentTransfer}>
-                💳 Solo Transferencia (+{transferFeePercentage}%)
+                💳 Solo Transferencia (+{transferFeePercentage}% = <Price amount={transferPrice} showCurrency={false} />)
               </span>
             )}
             {paymentType === 'both' && (
               <span className={styles.paymentBoth}>
-                💰💳 Efectivo y Transferencia (+{transferFeePercentage}%)
+                💰💳 Efectivo: <Price amount={price} showCurrency={false} /> | Transferencia: <Price amount={transferPrice} showCurrency={false} /> (+{transferFeePercentage}%)
               </span>
             )}
           </div>
